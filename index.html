@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Liquid Glass UI - Beta 6 (Ultra Pro)</title>
+    <title>Liquid Glass UI - Final Pro</title>
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.03);
@@ -14,8 +14,21 @@
             --accent-color: #ff8c00;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
+        * { 
+            box-sizing: border-box; margin: 0; padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif; 
+            -webkit-tap-highlight-color: transparent; scrollbar-width: none; 
+            /* ГЛОБАЛЬНЫЙ ЗАПРЕТ ВЫДЕЛЕНИЯ ТЕКСТА */
+            -webkit-user-select: none;
+            user-select: none;
+        }
         *::-webkit-scrollbar { display: none; }
+
+        /* Разрешаем выделение только для полей ввода */
+        input, textarea, select {
+            -webkit-user-select: auto;
+            user-select: auto;
+        }
 
         body { background-color: #050508; min-height: 100vh; overflow-x: hidden; position: relative; touch-action: pan-x pan-y; }
 
@@ -28,31 +41,23 @@
 
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(30px) saturate(150%); -webkit-backdrop-filter: blur(30px) saturate(150%); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
 
-        /* СТАТИЧНАЯ ШАПКА (Защита от наложения на Dynamic Island) */
-        .top-bar {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 90;
-            padding: calc(20px + env(safe-area-inset-top)) 24px 20px 24px;
-            background: linear-gradient(to bottom, rgba(5,5,8,0.8) 0%, rgba(5,5,8,0) 100%);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-            display: flex; justify-content: center; align-items: flex-end; height: 100px;
-        }
-        .top-bar h1 { color: var(--text-main); font-size: 16px; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; }
+        .app-container { position: relative; z-index: 10; width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; padding: 40px 24px 140px 24px; min-height: 100vh; }
+        
+        /* Заголовок (теперь скроллится со всеми) */
+        .header { display: flex; justify-content: center; align-items: center; margin-bottom: 40px; padding-top: 10px; }
+        .header h1 { color: var(--text-main); font-size: 16px; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; }
 
-        .app-container { position: relative; z-index: 10; width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; padding: 120px 24px 140px 24px; min-height: 100vh; }
         .view-section { display: none; flex-direction: column; animation: fadeIn 0.4s ease; flex-grow: 1; }
         .view-section.active-view { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Баланс с анимацией скрытия */
-        .balance-section { text-align: center; margin-bottom: 30px; cursor: pointer; user-select: none; display: inline-block; align-self: center; }
+        .balance-section { text-align: center; margin-bottom: 30px; cursor: pointer; display: inline-block; align-self: center; }
         .balance-wrapper { position: relative; display: inline-flex; justify-content: center; align-items: center; }
         .balance-real, .balance-hidden { transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         .balance-real { font-size: clamp(48px, 8vw, 72px); font-weight: 700; color: var(--text-main); }
         .cents { font-size: clamp(32px, 5vw, 48px); color: var(--text-muted); }
         .balance-hidden { position: absolute; font-size: clamp(48px, 8vw, 72px); font-weight: 700; color: var(--text-main); opacity: 0; transform: scale(0.8); filter: blur(10px); pointer-events: none; }
-        /* Состояние "скрыто" */
         .balance-section.is-hidden .balance-real { opacity: 0; transform: scale(1.1); filter: blur(10px); }
         .balance-section.is-hidden .balance-hidden { opacity: 1; transform: scale(1); filter: blur(0); }
 
@@ -80,7 +85,7 @@
         .tx-info p { color: var(--text-muted); font-size: 12px; }
         .tx-amount { font-size: 15px; font-weight: 600; color: var(--text-main); }
 
-        /* CARDS (Минимизировано) */
+        /* CARDS */
         .cards-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 20px; padding-bottom: 20px; margin: 0 -24px; padding: 0 24px; }
         .card-slide { scroll-snap-align: center; flex: 0 0 100%; display: flex; flex-direction: column; gap: 24px; }
         .credit-card { width: 100%; aspect-ratio: 1.586; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
@@ -107,16 +112,28 @@
         .select-glass { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 8px 16px; border-radius: 12px; outline: none; font-size: 14px; cursor: pointer; }
         .select-glass option { background: #1a1a1a; color: #fff; }
 
-        /* МОДАЛКИ (Всплывающие окна с анимацией) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; padding: 20px; }
-        .modal-overlay.active { display: flex; opacity: 1; }
+        /* === ПЛАВНЫЕ МОДАЛКИ (Без display:none) === */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
+            z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
+            
+            /* Секрет плавности: управляем видимостью, а не display */
+            visibility: hidden; opacity: 0; pointer-events: none; 
+            transition: opacity 0.4s ease, visibility 0.4s ease; 
+        }
+        .modal-overlay.active { 
+            visibility: visible; opacity: 1; pointer-events: auto; 
+        }
         
         .modal-content { 
             width: 100%; max-width: 400px; padding: 30px; border-radius: 32px; display: flex; flex-direction: column; gap: 20px; position: relative;
-            transform: scale(0.85) translateY(20px); opacity: 0; 
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Пружинистое появление */
+            transform: scale(0.85) translateY(20px); 
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Пружинистое масштабирование */
         }
-        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); opacity: 1; }
+        .modal-overlay.active .modal-content { 
+            transform: scale(1) translateY(0); 
+        }
         
         .modal-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
         .modal-title { color: var(--text-main); font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 10px;}
@@ -127,8 +144,12 @@
         .calc-result { text-align: center; color: var(--text-main); font-size: 24px; font-weight: 700; margin: 10px 0; }
         .calc-label { text-align: center; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;}
 
-        /* BOTTOM SHEET (Свайп вниз для закрытия) */
-        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        /* BOTTOM SHEET */
+        .sheet-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); 
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; 
+        }
         .sheet-overlay.active { opacity: 1; pointer-events: auto; }
         .bottom-sheet { 
             position: absolute; bottom: 0; left: 50%; width: 100%; max-width: 800px; 
@@ -146,11 +167,9 @@
         .sheet-amount { font-size: 32px; font-weight: 700; color: var(--text-main); margin-bottom: 30px; }
         .sheet-details { width: 100%; display: flex; flex-direction: column; gap: 16px; background: rgba(255,255,255,0.02); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px; }
 
-        /* DOCK С ЭФФЕКТОМ ЛУПЫ */
+        /* DOCK */
         .bottom-nav-container { position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
         .bottom-nav { pointer-events: auto; border-radius: 40px; padding: 12px 24px; display: flex; gap: 10px; position: relative; }
-        
-        /* Добавил var(--loupe-scale) для увеличения */
         .nav-bubble { 
             position: absolute; top: 12px; left: 24px; width: 80px; height: 56px; 
             background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); 
@@ -158,12 +177,8 @@
             transform: translateX(0) scale(var(--loupe-scale, 1));
             transition: transform 0.4s cubic-bezier(0.25, 1.2, 0.5, 1); z-index: 1; pointer-events: none; 
         }
-        
-        .nav-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 56px; cursor: pointer; user-select: none; transition: transform 0.3s; }
-        
-        /* Класс увеличивает активный элемент внутри лупы */
+        .nav-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 56px; cursor: pointer; transition: transform 0.3s; }
         .nav-item.loupe-active { transform: scale(1.15); }
-        
         .nav-icon { font-weight: 700; font-size: 18px; color: var(--text-muted); margin-bottom: 2px; transition: color 0.3s; }
         .nav-label { color: var(--text-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.3s; }
         .nav-item.active .nav-icon, .nav-item.active .nav-label { color: var(--text-main); }
@@ -176,11 +191,11 @@
         <div class="blob blob-2"></div>
     </div>
 
-    <header class="top-bar">
-        <h1 id="headerTitle" data-i18n="balance">Balance</h1>
-    </header>
-
     <div class="app-container">
+        <header class="header">
+            <h1 id="headerTitle" data-i18n="balance">Balance</h1>
+        </header>
+
         <div id="view-balance" class="view-section active-view">
             <div class="balance-section" id="balanceToggle">
                 <div class="balance-wrapper">
@@ -256,13 +271,13 @@
     </div>
 
     <div class="modal-overlay" id="receiveModal" onclick="closeModals(event)">
-        <div class="modal-content glass-panel" id="receiveContentMain">
+        <div class="modal-content glass-panel" id="receiveContentMain" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="forceCloseModals()">×</button>
             <h3 class="modal-title" data-i18n="deposit_method">Deposit Method</h3>
             <button class="btn-glass" onclick="alert('СБП...')">СБП</button>
             <button class="btn-glass" onclick="showCryptoFlow()">Crypto</button>
         </div>
-        <div class="modal-content glass-panel" id="receiveContentCrypto" style="display: none;">
+        <div class="modal-content glass-panel" id="receiveContentCrypto" style="display: none;" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="forceCloseModals()">×</button>
             <h3 class="modal-title" data-i18n="crypto_deposit">Crypto Deposit</h3>
             <input type="number" id="cryptoInput" class="input-glass" placeholder="Enter amount (USD)" />
@@ -271,8 +286,9 @@
             <button class="btn-glass" data-i18n="continue">Continue</button>
         </div>
     </div>
+    
     <div class="modal-overlay" id="sendModal" onclick="closeModals(event)">
-        <div class="modal-content glass-panel">
+        <div class="modal-content glass-panel" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="forceCloseModals()">×</button>
             <h3 class="modal-title" data-i18n="top_up_card">Top Up Card</h3>
             <div class="calc-label" data-i18n="total_balance">Total Balance</div>
@@ -326,29 +342,23 @@
             document.getElementById('sendInput').placeholder = i18n[currentLang].placeholder_send;
         }
 
-        // Анимация скрытия баланса (Blur/Scale)
+        // Анимация скрытия баланса
         document.getElementById('balanceToggle').addEventListener('click', function() {
             this.classList.toggle('is-hidden');
         });
 
-        // Навигация (Dock) и эффект Лупы (Loupe)
+        // Навигация
         const navBar = document.getElementById('mainNav');
         const navBubble = document.getElementById('navBubble');
         const headerTitle = document.getElementById('headerTitle');
         const views = document.querySelectorAll('.view-section');
         const navItems = Array.from(document.querySelectorAll('.nav-item'));
-        let currentNavX = 0;
-
-        function updateBubblePosition(element) {
-            currentNavX = element.offsetLeft - 24;
-            navBubble.style.transform = `translateX(${currentNavX}px) scale(var(--loupe-scale, 1))`;
-        }
 
         function switchTab(element, viewId, titleKey) {
             navItems.forEach(el => { el.classList.remove('active'); el.classList.remove('loupe-active'); });
             element.classList.add('active');
             navBubble.style.transition = 'transform 0.4s cubic-bezier(0.25, 1.2, 0.5, 1)';
-            updateBubblePosition(element);
+            navBubble.style.transform = `translateX(${element.offsetLeft - 24}px) scale(var(--loupe-scale, 1))`;
             
             headerTitle.innerText = i18n[currentLang][titleKey] || titleKey;
             headerTitle.setAttribute('data-i18n', titleKey);
@@ -356,9 +366,8 @@
             document.getElementById(viewId).classList.add('active-view');
         }
 
-        // Логика перетаскивания и лупы
-        navBar.addEventListener('touchstart', (e) => {
-            // Включаем эффект лупы
+        // Эффект Лупы
+        navBar.addEventListener('touchstart', () => {
             navBubble.style.setProperty('--loupe-scale', '1.15');
             navItems.find(el => el.classList.contains('active')).classList.add('loupe-active');
         }, { passive: true });
@@ -367,45 +376,54 @@
             e.preventDefault();
             let x = e.touches[0].clientX - navBar.getBoundingClientRect().left;
             if (x < 64) x = 64; if (x > navBar.offsetWidth - 64) x = navBar.offsetWidth - 64;
-            
             navBubble.style.transition = 'none';
-            navBubble.style.transform = `translateX(${x - 64}px) scale(1.15)`; // держим лупу
-
-            // Подсвечиваем иконку под пальцем
+            navBubble.style.transform = `translateX(${x - 64}px) scale(1.15)`;
             let closestItem = navItems.reduce((prev, curr) => Math.abs(curr.offsetLeft + 40 - x) < Math.abs(prev.offsetLeft + 40 - x) ? curr : prev);
             navItems.forEach(el => el.classList.remove('loupe-active'));
             closestItem.classList.add('loupe-active');
-
         }, { passive: false });
 
         navBar.addEventListener('touchend', (e) => {
-            navBubble.style.setProperty('--loupe-scale', '1'); // выключаем лупу
+            navBubble.style.setProperty('--loupe-scale', '1');
             let x = e.changedTouches[0].clientX - navBar.getBoundingClientRect().left;
             let closestItem = navItems.reduce((prev, curr) => Math.abs(curr.offsetLeft + 40 - x) < Math.abs(prev.offsetLeft + 40 - x) ? curr : prev);
-            closestItem.click(); // Это переключит таб и сбросит классы
+            closestItem.click();
         });
 
         // Модалки
         const receiveModal = document.getElementById('receiveModal');
         const sendModal = document.getElementById('sendModal');
         
-        function openReceiveModal() { document.getElementById('receiveContentMain').style.display = 'flex'; document.getElementById('receiveContentCrypto').style.display = 'none'; receiveModal.classList.add('active'); }
-        function openSendModal() { sendModal.classList.add('active'); }
-        
-        // Закрытие по клику ВНЕ контента
-        function closeModals(e) {
-            if (e.target === receiveModal) receiveModal.classList.remove('active');
-            if (e.target === sendModal) sendModal.classList.remove('active');
+        function openReceiveModal() { 
+            document.getElementById('receiveContentMain').style.display = 'flex'; 
+            document.getElementById('receiveContentCrypto').style.display = 'none'; 
+            receiveModal.classList.add('active'); 
+            document.body.style.overflow = 'hidden'; // Защита от скролла фона
         }
-        function forceCloseModals() { receiveModal.classList.remove('active'); sendModal.classList.remove('active'); }
-        function showCryptoFlow() { document.getElementById('receiveContentMain').style.display = 'none'; document.getElementById('receiveContentCrypto').style.display = 'flex'; }
+        function openSendModal() { 
+            sendModal.classList.add('active'); 
+            document.body.style.overflow = 'hidden'; 
+        }
         
+        function closeModals(e) {
+            if (e && e.target !== receiveModal && e.target !== sendModal) return;
+            forceCloseModals();
+        }
+        function forceCloseModals() { 
+            receiveModal.classList.remove('active'); 
+            sendModal.classList.remove('active'); 
+            document.body.style.overflow = ''; // Возвращаем скролл
+        }
+        function showCryptoFlow() { 
+            document.getElementById('receiveContentMain').style.display = 'none'; 
+            document.getElementById('receiveContentCrypto').style.display = 'flex'; 
+        }
         document.getElementById('cryptoInput').addEventListener('input', (e) => {
             document.getElementById('cryptoTotal').innerText = `$${((parseFloat(e.target.value) || 0) * 0.93).toFixed(2)}`;
         });
         function goToCards() { forceCloseModals(); document.getElementById('tab-cards').click(); }
 
-        // Транзакции (Bottom Sheet Drag to Close)
+        // Транзакции (Bottom Sheet Drag to Close + фикс скролла)
         const txOverlay = document.getElementById('txDetailOverlay');
         const txSheet = document.getElementById('txBottomSheet');
         let sheetStartY = 0; let sheetCurrentY = 0;
@@ -418,6 +436,8 @@
             document.getElementById('txDetailDate').setAttribute('data-i18n', dateKey);
             document.getElementById('txDetailCategory').innerText = category;
             
+            document.body.style.overflow = 'hidden'; // Блокируем скролл фона
+            
             txSheet.style.transition = 'transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)';
             txSheet.style.transform = `translateX(-50%) translateY(0)`;
             txOverlay.classList.add('active');
@@ -426,28 +446,30 @@
         function closeTxDetail(e) { if (e && e.target === txOverlay) forceCloseTxDetail(); }
         function forceCloseTxDetail() { 
             txSheet.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
-            txSheet.style.transform = `translateX(-50%) translateY(100%)`; // Уезжает вниз
+            txSheet.style.transform = `translateX(-50%) translateY(100%)`;
             txOverlay.classList.remove('active'); 
+            document.body.style.overflow = ''; // Возвращаем скролл фона
         }
 
-        // Логика свайпа вниз для Bottom Sheet
+        // Физика свайпа для карточки транзакции
         txSheet.addEventListener('touchstart', (e) => {
             sheetStartY = e.touches[0].clientY;
-            txSheet.style.transition = 'none'; // Отключаем плавность пока тащим пальцем
+            sheetCurrentY = sheetStartY;
+            txSheet.style.transition = 'none';
         }, { passive: true });
 
         txSheet.addEventListener('touchmove', (e) => {
-            sheetCurrentY = e.touches[0].clientY;
-            let diff = sheetCurrentY - sheetStartY;
-            if (diff > 0) { // Позволяем тянуть только ВНИЗ
+            let diff = e.touches[0].clientY - sheetStartY;
+            if (diff > 0) { 
+                e.preventDefault(); // Останавливает любое дергание браузера
+                sheetCurrentY = e.touches[0].clientY;
                 txSheet.style.transform = `translateX(-50%) translateY(${diff}px)`;
             }
-        }, { passive: true });
+        }, { passive: false }); // Важно! passive: false позволяет использовать preventDefault()
 
         txSheet.addEventListener('touchend', () => {
             let diff = sheetCurrentY - sheetStartY;
             txSheet.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
-            // Если свайпнули вниз больше чем на 100px — закрываем, иначе возвращаем на место
             if (diff > 100) {
                 forceCloseTxDetail();
             } else {
