@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Liquid Glass UI - Beta 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Liquid Glass UI - Beta 5 (Pro Animations)</title>
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.03);
@@ -14,348 +14,148 @@
             --accent-color: #ff8c00;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            scrollbar-width: none; /* Скрываем скроллбар */
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
 
-        body {
-            background-color: #050508;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            overflow-x: hidden;
-            position: relative;
-        }
+        body { background-color: #050508; min-height: 100vh; display: flex; justify-content: center; overflow-x: hidden; position: relative; touch-action: pan-x pan-y; }
 
-        /* Анимированный "жидкий" фон */
-        .liquid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
+        /* Фон */
+        .liquid-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); animation: float 15s infinite ease-in-out alternate; opacity: 0.6; }
+        .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: linear-gradient(135deg, #cc5500, #ff8c00); top: -10%; left: -10%; }
+        .blob-2 { width: 60vw; height: 60vw; max-width: 700px; max-height: 700px; background: linear-gradient(135deg, #005c99, #00b4d8); bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 80px) scale(1.1); } }
+
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(30px) saturate(150%); -webkit-backdrop-filter: blur(30px) saturate(150%); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+
+        .app-container { position: relative; z-index: 10; width: 100%; max-width: 800px; min-height: 100vh; display: flex; flex-direction: column; padding: 40px 24px 140px 24px; }
+        .view-section { display: none; flex-direction: column; animation: fadeIn 0.4s ease; flex-grow: 1; }
+        .view-section.active-view { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header { display: flex; justify-content: space-between; align-items: center; color: var(--text-main); margin-bottom: 40px; }
+        .header h1 { font-size: 16px; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; margin: 0 auto; transition: opacity 0.3s; }
+
+        /* Баланс */
+        .balance-section { text-align: center; margin-bottom: 30px; cursor: pointer; user-select: none; display: inline-block; align-self: center; }
+        .balance-amount { font-size: clamp(48px, 8vw, 72px); font-weight: 700; color: var(--text-main); transition: opacity 0.3s ease; }
+        .cents { font-size: clamp(32px, 5vw, 48px); color: var(--text-muted); }
+
+        /* === ИСПРАВЛЕННЫЙ БЛОК КНОПОК === */
+        .actions-group { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 40px; }
+        .actions-pill { display: flex; justify-content: center; gap: 50px; border-radius: 100px; padding: 10px 20px; }
+        .actions-labels { display: flex; justify-content: center; gap: 50px; padding: 0 20px; }
         
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: float 15s infinite ease-in-out alternate;
-            opacity: 0.6;
+        .action-btn { 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            color: var(--text-main); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); 
+            cursor: pointer; 
+            /* Плавная пружинистая анимация */
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
-
-        .blob-1 {
-            width: 50vw; height: 50vw;
-            max-width: 600px; max-height: 600px;
-            background: linear-gradient(135deg, #cc5500, #ff8c00);
-            top: -10%; left: -10%;
+        .action-btn:hover { 
+            transform: scale(1.15); /* Увеличил масштаб при наведении */
+            background: rgba(255, 255, 255, 0.15); 
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
-
-        .blob-2 {
-            width: 60vw; height: 60vw;
-            max-width: 700px; max-height: 700px;
-            background: linear-gradient(135deg, #005c99, #00b4d8);
-            bottom: -10%; right: -10%;
-            animation-delay: -5s;
+        .action-btn:active {
+            transform: scale(0.9); /* Эффект продавливания */
+            transition: all 0.1s; /* Быстрый отклик на нажатие */
         }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 80px) scale(1.1); }
-        }
-
-        /* Общие классы стекла */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px) saturate(150%);
-            -webkit-backdrop-filter: blur(30px) saturate(150%);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* Контейнер приложения */
-        .app-container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 800px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 40px 24px 140px 24px; /* Увеличили нижний паддинг для отступа от меню */
-        }
-
-        /* Скрываемые вьюхи */
-        .view-section {
-            display: none;
-            flex-direction: column;
-            animation: fadeIn 0.4s ease;
-            flex-grow: 1;
-        }
-        .view-section.active-view {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Шапка */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-main);
-            margin-bottom: 40px;
-        }
-        .header h1 {
-            font-size: 16px;
-            letter-spacing: 3px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin: 0 auto;
-        }
-
-        /* ---- VIEW: BALANCE ---- */
-        .balance-section {
-            text-align: center;
-            margin-bottom: 50px;
-            cursor: pointer;
-            user-select: none;
-            transition: transform 0.2s;
-            display: inline-block;
-            align-self: center;
-        }
-        .balance-section:hover { transform: scale(1.02); }
-        .balance-amount {
-            font-size: clamp(48px, 8vw, 72px);
-            font-weight: 700;
-            color: var(--text-main);
-            transition: opacity 0.3s ease;
-        }
-        .cents {
-            font-size: clamp(32px, 5vw, 48px);
-            color: var(--text-muted);
-        }
-
-        /* Пилюля с действиями */
-        .actions-pill {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 0 auto 50px auto;
-            border-radius: 100px;
-            padding: 10px 30px;
-            width: fit-content;
-        }
-        .action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            padding: 10px;
-            transition: transform 0.2s ease;
-        }
-        .action-item:hover { transform: translateY(-3px); }
-        .action-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .action-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
-        .action-label { color: var(--text-main); font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .action-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+        
+        /* Обёртка шириной 50px (как кнопка) позволяет тексту растягиваться за свои пределы, но оставаться по центру */
+        .action-label-wrapper { width: 50px; display: flex; justify-content: center; overflow: visible; }
+        .action-label { white-space: nowrap; color: var(--text-main); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
 
         /* Транзакции */
-        .transactions {
-            border-radius: 32px;
-            padding: 32px;
-            flex-grow: 1;
-            margin-bottom: 20px; /* Отступ от нижнего меню */
+        .transactions { border-radius: 32px; padding: 24px; flex-grow: 1; margin-bottom: 20px; }
+        .transactions-title { color: var(--text-muted); font-size: 13px; font-weight: 600; letter-spacing: 2px; margin-bottom: 20px; }
+        .transaction-list { display: flex; flex-direction: column; gap: 12px; }
+        .transaction-item { 
+            display: flex; align-items: center; justify-content: space-between; padding: 16px; 
+            background: rgba(255, 255, 255, 0.02); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.04); 
+            cursor: pointer; transition: all 0.3s ease;
         }
-        .transactions-title { color: var(--text-muted); font-size: 13px; font-weight: 600; letter-spacing: 2px; margin-bottom: 24px; }
-        .transaction-list { display: flex; flex-direction: column; gap: 16px; }
-        .transaction-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: background 0.3s;
-        }
-        .transaction-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .transaction-item:hover { background: rgba(255, 255, 255, 0.08); transform: scale(1.02); }
+        .transaction-item:active { transform: scale(0.98); }
         .tx-left { display: flex; align-items: center; gap: 16px; }
-        .tx-icon {
-            width: 48px; height: 48px;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.1);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 20px;
-        }
-        .tx-info h4 { color: var(--text-main); font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-        .tx-info p { color: var(--text-muted); font-size: 13px; }
-        .tx-amount { font-size: 16px; font-weight: 600; }
-        .tx-amount.negative { color: var(--text-main); }
-        .tx-amount.positive { color: #4cd964; }
+        .tx-icon { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 18px; }
+        .tx-info h4 { color: var(--text-main); font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+        .tx-info p { color: var(--text-muted); font-size: 12px; }
+        .tx-amount { font-size: 15px; font-weight: 600; color: var(--text-main); }
 
-        /* ---- VIEW: CARDS ---- */
-        .cards-carousel {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 20px;
-            padding-bottom: 20px;
-            margin: 0 -24px; /* Вытягиваем за края контейнера для красивого скролла */
-            padding: 0 24px;
-        }
-        .card-slide {
-            scroll-snap-align: center;
-            flex: 0 0 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* Дизайн самой карты */
-        .credit-card {
-            width: 100%;
-            aspect-ratio: 1.586; /* Пропорции банковской карты */
-            border-radius: 24px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-        }
+        /* VIEW: CARDS (Свернул стили для компактности кода) */
+        .cards-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 20px; padding-bottom: 20px; margin: 0 -24px; padding: 0 24px; }
+        .card-slide { scroll-snap-align: center; flex: 0 0 100%; display: flex; flex-direction: column; gap: 24px; }
+        .credit-card { width: 100%; aspect-ratio: 1.586; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .card-online { background: linear-gradient(135deg, rgba(255,140,0,0.8), rgba(204,85,0,0.8)); backdrop-filter: blur(20px); }
         .card-visa { background: linear-gradient(135deg, rgba(0,180,216,0.8), rgba(0,92,153,0.8)); backdrop-filter: blur(20px); }
-        
         .card-header { display: flex; justify-content: space-between; align-items: center; }
         .card-title { font-size: 16px; font-weight: 600; color: #fff; letter-spacing: 1px; }
         .card-logo { font-size: 24px; font-weight: bold; font-style: italic; color: #fff; }
         .card-chip { width: 45px; height: 35px; background: rgba(255,255,255,0.3); border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); }
         .card-balance-lbl { font-size: 12px; opacity: 0.8; margin-top: auto; color: #fff;}
         .card-balance-val { font-size: 28px; font-weight: 700; color: #fff;}
-
-        /* Инфо о тарифах */
-        .card-details {
-            border-radius: 24px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .card-details { border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
         .detail-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;}
         .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
         .detail-label { color: var(--text-muted); font-size: 14px; }
         .detail-value { color: var(--text-main); font-weight: 600; font-size: 14px; text-align: right;}
         .detail-value.highlight { color: var(--accent-color); }
+        .btn-glass { width: 100%; padding: 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: var(--text-main); font-size: 16px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); transition: background 0.3s, transform 0.2s; }
+        .btn-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
 
-        .issue-btn {
-            width: 100%;
-            padding: 18px;
-            border-radius: 20px;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: var(--text-main);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(20px);
-            transition: background 0.3s, transform 0.2s;
-        }
-        .issue-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        /* VIEW: SETTINGS */
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .settings-label { color: var(--text-main); font-size: 16px; font-weight: 500; }
+        .select-glass { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 8px 16px; border-radius: 12px; outline: none; font-size: 14px; cursor: pointer; }
+        .select-glass option { background: #1a1a1a; color: #fff; }
 
-        /* ---- Нижнее меню (Dock) ---- */
-        .bottom-nav-container {
-            position: fixed;
-            bottom: 30px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            z-index: 100;
-            pointer-events: none;
-        }
-        .bottom-nav {
-            pointer-events: auto;
-            border-radius: 40px;
-            padding: 12px 24px;
-            display: flex;
-            gap: 10px;
-            position: relative; /* Для позиционирования пузыря */
-        }
-        
-        /* Тот самый жидкий пузырь IOS 26 */
-        .nav-bubble {
-            position: absolute;
-            top: 12px; /* Совпадает с padding-top у nav */
-            left: 24px; /* Начальная позиция */
-            width: 80px; /* Примерная ширина элемента */
-            height: 56px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
-            transition: all 0.4s cubic-bezier(0.25, 1.2, 0.5, 1); /* Пружинистая анимация */
-            z-index: 1;
-            pointer-events: none;
-        }
+        /* МОДАЛКИ (Центральные) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; padding: 20px; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { width: 100%; max-width: 400px; padding: 30px; border-radius: 32px; display: flex; flex-direction: column; gap: 20px; position: relative; }
+        .modal-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .modal-title { color: var(--text-main); font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 10px;}
+        .input-glass { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 16px; border-radius: 16px; color: var(--text-main); font-size: 18px; text-align: center; outline: none; transition: border-color 0.3s; }
+        .input-glass:focus { border-color: var(--text-main); }
+        .input-glass::placeholder { color: rgba(255,255,255,0.3); }
+        .input-info { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 12px; margin-top: -10px; padding: 0 10px; }
+        .calc-result { text-align: center; color: var(--text-main); font-size: 24px; font-weight: 700; margin: 10px 0; }
+        .calc-label { text-align: center; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;}
 
-        .nav-item {
-            position: relative;
-            z-index: 2; /* Поверх пузыря */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 80px;
-            height: 56px;
-            cursor: pointer;
-            transition: opacity 0.2s;
+        /* === БОКОВОЕ/НИЖНЕЕ ОКНО ТРАНЗАКЦИЙ (Bottom Sheet) === */
+        .sheet-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); 
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; 
         }
-        .nav-icon {
-            font-weight: 700;
-            font-size: 18px;
-            color: var(--text-muted);
-            transition: color 0.3s;
-            margin-bottom: 2px;
+        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        .bottom-sheet { 
+            position: absolute; bottom: 0; left: 50%; width: 100%; max-width: 800px; 
+            transform: translateX(-50%) translateY(100%); 
+            background: var(--glass-bg); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border-top: 1px solid var(--glass-border); border-left: 1px solid var(--glass-border); border-right: 1px solid var(--glass-border);
+            border-radius: 32px 32px 0 0; padding: 30px 24px 60px 24px; 
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column; align-items: center;
         }
-        .nav-label {
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            transition: color 0.3s;
-        }
-        
-        /* Активное состояние (цвет текста меняется, пузырь подъезжает сзади) */
-        .nav-item.active .nav-icon,
-        .nav-item.active .nav-label { color: var(--text-main); }
+        .sheet-overlay.active .bottom-sheet { transform: translateX(-50%) translateY(0); }
+        .sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-bottom: 30px; }
+        .sheet-icon { width: 70px; height: 70px; font-size: 32px; border-radius: 20px; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .sheet-title { color: var(--text-main); font-size: 22px; font-weight: 600; margin-bottom: 5px; }
+        .sheet-amount { font-size: 32px; font-weight: 700; color: var(--text-main); margin-bottom: 30px; }
+        .sheet-details { width: 100%; display: flex; flex-direction: column; gap: 16px; background: rgba(255,255,255,0.02); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px; }
 
-        @media (max-width: 480px) {
-            .cards-carousel { margin: 0 -16px; padding: 0 16px; }
-        }
+        /* Dock */
+        .bottom-nav-container { position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
+        .bottom-nav { pointer-events: auto; border-radius: 40px; padding: 12px 24px; display: flex; gap: 10px; position: relative; }
+        .nav-bubble { position: absolute; top: 12px; left: 24px; width: 80px; height: 56px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 30px; box-shadow: 0 0 20px rgba(255,255,255,0.1); transition: transform 0.4s cubic-bezier(0.25, 1.2, 0.5, 1); z-index: 1; pointer-events: none; }
+        .nav-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 56px; cursor: pointer; user-select: none; }
+        .nav-icon { font-weight: 700; font-size: 18px; color: var(--text-muted); margin-bottom: 2px; transition: color 0.3s; }
+        .nav-label { color: var(--text-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.3s; }
+        .nav-item.active .nav-icon, .nav-item.active .nav-label { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -366,65 +166,40 @@
     </div>
 
     <div class="app-container">
-        
         <header class="header">
-            <h1 id="headerTitle">Balance</h1>
+            <h1 id="headerTitle" data-i18n="balance">Balance</h1>
         </header>
 
         <div id="view-balance" class="view-section active-view">
             <div class="balance-section" id="balanceToggle">
-                <div class="balance-amount" id="balanceAmount">
-                    $1000<span class="cents" id="balanceCents">.00</span>
-                </div>
+                <div class="balance-amount" id="balanceAmount">$1000<span class="cents" id="balanceCents">.00</span></div>
             </div>
 
-            <div class="actions-pill glass-panel">
-                <div class="action-item" onclick="alert('Receive money')">
-                    <div class="action-btn">
+            <div class="actions-group">
+                <div class="actions-pill glass-panel">
+                    <div class="action-btn" onclick="openReceiveModal()">
                         <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                     </div>
-                    <span class="action-label">Receive</span>
-                </div>
-                <div class="action-item" onclick="alert('Send money')">
-                    <div class="action-btn">
+                    <div class="action-btn" onclick="openSendModal()">
                         <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
                     </div>
-                    <span class="action-label">Send</span>
+                </div>
+                <div class="actions-labels">
+                    <div class="action-label-wrapper"><span class="action-label" data-i18n="receive">Receive</span></div>
+                    <div class="action-label-wrapper"><span class="action-label" data-i18n="send">Send</span></div>
                 </div>
             </div>
 
             <section class="transactions glass-panel">
-                <h2 class="transactions-title">RECENT TRANSACTIONS</h2>
+                <h2 class="transactions-title" data-i18n="recent_tx">RECENT TRANSACTIONS</h2>
                 <div class="transaction-list">
-                    <div class="transaction-item">
-                        <div class="tx-left">
-                            <div class="tx-icon">🍎</div>
-                            <div class="tx-info">
-                                <h4>Apple Store</h4>
-                                <p>Today, 10:42 AM</p>
-                            </div>
-                        </div>
-                        <div class="tx-amount negative">-$99.00</div>
+                    <div class="transaction-item" onclick="openTxDetail('Apple Store', '🍎', '-$99.00', 'today_time', 'Electronics')">
+                        <div class="tx-left"><div class="tx-icon">🍎</div><div class="tx-info"><h4>Apple Store</h4><p data-i18n="today_time">Today, 10:42 AM</p></div></div>
+                        <div class="tx-amount">-$99.00</div>
                     </div>
-                    <div class="transaction-item">
-                        <div class="tx-left">
-                            <div class="tx-icon">☕</div>
-                            <div class="tx-info">
-                                <h4>Starbucks</h4>
-                                <p>Yesterday, 08:15 AM</p>
-                            </div>
-                        </div>
-                        <div class="tx-amount negative">-$5.40</div>
-                    </div>
-                    <div class="transaction-item">
-                        <div class="tx-left">
-                            <div class="tx-icon">💼</div>
-                            <div class="tx-info">
-                                <h4>Upwork Escrow</h4>
-                                <p>Feb 12, 14:00 PM</p>
-                            </div>
-                        </div>
-                        <div class="tx-amount positive">+$500.00</div>
+                    <div class="transaction-item" onclick="openTxDetail('Starbucks', '☕', '-$5.40', 'yesterday_time', 'Food & Drink')">
+                        <div class="tx-left"><div class="tx-icon">☕</div><div class="tx-info"><h4>Starbucks</h4><p data-i18n="yesterday_time">Yesterday, 08:15 AM</p></div></div>
+                        <div class="tx-amount">-$5.40</div>
                     </div>
                 </div>
             </section>
@@ -432,174 +207,262 @@
 
         <div id="view-cards" class="view-section">
             <div class="cards-carousel">
-                
                 <div class="card-slide">
                     <div class="credit-card card-online">
-                        <div class="card-header">
-                            <span class="card-title">Online Card</span>
-                            <span class="card-logo">Mastercard</span>
-                        </div>
+                        <div class="card-header"><span class="card-title" data-i18n="online_card">Online Card</span><span class="card-logo">Mastercard</span></div>
                         <div class="card-chip"></div>
-                        <div>
-                            <div class="card-balance-lbl">Prepaid Balance</div>
-                            <div class="card-balance-val">$15.00</div>
-                        </div>
+                        <div><div class="card-balance-lbl" data-i18n="prepaid_balance">Prepaid Balance</div><div class="card-balance-val">$15.00</div></div>
                     </div>
-                    
                     <div class="card-details glass-panel">
-                        <div class="detail-row">
-                            <span class="detail-label">Features</span>
-                            <span class="detail-value">Online Only</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Activation Fee</span>
-                            <span class="detail-value highlight">$5.00</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Monthly Maintenance</span>
-                            <span class="detail-value">$2.50</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Success Tx Fee</span>
-                            <span class="detail-value">$0.50</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Declined Tx Fee</span>
-                            <span class="detail-value">$0.70 - $1.30</span>
-                        </div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="features">Features</span><span class="detail-value" data-i18n="online_only">Online Only</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="activation_fee">Activation Fee</span><span class="detail-value highlight">$5.00</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="monthly_maint">Monthly Maintenance</span><span class="detail-value">$2.50</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="success_tx">Success Tx Fee</span><span class="detail-value">$0.50</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="declined_tx">Declined Tx Fee</span><span class="detail-value">$0.70 - $1.30</span></div>
                     </div>
-                    
-                    <button class="issue-btn">Оформить карту</button>
+                    <button class="btn-glass" data-i18n="issue_card">Issue Card</button>
                 </div>
-
                 <div class="card-slide">
                     <div class="credit-card card-visa">
-                        <div class="card-header">
-                            <span class="card-title">Premium Card</span>
-                            <span class="card-logo">VISA</span>
-                        </div>
+                        <div class="card-header"><span class="card-title" data-i18n="premium_card">Premium Card</span><span class="card-logo">VISA</span></div>
                         <div class="card-chip"></div>
-                        <div>
-                            <div class="card-balance-lbl">Support</div>
-                            <div class="card-balance-val">Apple / Google Pay</div>
-                        </div>
+                        <div><div class="card-balance-lbl" data-i18n="prepaid_balance">Prepaid Balance</div><div class="card-balance-val">$15.00</div></div>
                     </div>
-                    
                     <div class="card-details glass-panel">
-                        <div class="detail-row">
-                            <span class="detail-label">Features</span>
-                            <span class="detail-value">NFC, Offline, Online</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Activation Fee</span>
-                            <span class="detail-value highlight">$25.00</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Monthly Maintenance</span>
-                            <span class="detail-value">$5.00</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Tx Fee (up to $50)</span>
-                            <span class="detail-value">$1.00</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Tx Fee (over $50)</span>
-                            <span class="detail-value highlight">$0.00</span>
-                        </div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="features">Features</span><span class="detail-value">Google/Apple Pay, NFC</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="activation_fee">Activation Fee</span><span class="detail-value highlight">$25.00</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="monthly_maint">Monthly Maintenance</span><span class="detail-value">$5.00</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="tx_fee_up">Tx Fee (up to $50)</span><span class="detail-value">$1.00</span></div>
+                        <div class="detail-row"><span class="detail-label" data-i18n="tx_fee_over">Tx Fee (over $50)</span><span class="detail-value highlight">$0.00</span></div>
                     </div>
-                    
-                    <button class="issue-btn">Оформить карту</button>
+                    <button class="btn-glass" data-i18n="issue_card">Issue Card</button>
                 </div>
-
             </div>
         </div>
 
         <div id="view-settings" class="view-section">
-            <section class="transactions glass-panel" style="text-align: center; padding: 60px 20px;">
-                <h2 class="transactions-title" style="margin:0;">SETTINGS MODULE</h2>
-                <p style="color: var(--text-muted); margin-top: 10px;">Здесь будут настройки</p>
-            </section>
+            <div class="transactions glass-panel">
+                <h2 class="transactions-title" data-i18n="preferences">PREFERENCES</h2>
+                <div class="settings-row">
+                    <span class="settings-label" data-i18n="language">Language</span>
+                    <select class="select-glass" id="langSelect" onchange="changeLanguage()">
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+            </div>
         </div>
+    </div>
 
+    <div class="modal-overlay" id="receiveModal">
+        <div class="modal-content glass-panel" id="receiveContentMain">
+            <button class="modal-close" onclick="closeModals()">×</button>
+            <h3 class="modal-title" data-i18n="deposit_method">Deposit Method</h3>
+            <button class="btn-glass" onclick="alert('СБП...')">СБП</button>
+            <button class="btn-glass" onclick="showCryptoFlow()">Crypto</button>
+        </div>
+        <div class="modal-content glass-panel" id="receiveContentCrypto" style="display: none;">
+            <button class="modal-close" onclick="closeModals()">×</button>
+            <h3 class="modal-title" data-i18n="crypto_deposit">Crypto Deposit</h3>
+            <input type="number" id="cryptoInput" class="input-glass" placeholder="Enter amount (USD)" />
+            <div class="input-info"><span data-i18n="limits">Limits: $1 - $100,000</span><span data-i18n="fee">Fee: 7%</span></div>
+            <div style="margin-top: 10px;">
+                <div class="calc-label" data-i18n="total_receive">Total to receive</div>
+                <div class="calc-result" id="cryptoTotal">$0.00</div>
+            </div>
+            <button class="btn-glass" data-i18n="continue">Continue</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="sendModal">
+        <div class="modal-content glass-panel">
+            <button class="modal-close" onclick="closeModals()">×</button>
+            <h3 class="modal-title" data-i18n="top_up_card">Top Up Card</h3>
+            <div class="calc-label" data-i18n="total_balance">Total Balance</div>
+            <div class="calc-result" style="margin-top:0;">$1000.00</div>
+            <input type="number" class="input-glass" id="sendInput" placeholder="Amount to send" />
+            <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; margin: 10px 0;">
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;" data-i18n="no_cards">You have no active cards to top up.</p>
+                <button class="btn-glass" style="padding: 10px; font-size: 14px;" onclick="goToCards()" data-i18n="create_card">Create Card</button>
+            </div>
+            <button class="btn-glass" style="opacity: 0.5; pointer-events: none;" data-i18n="btn_top_up">Top Up</button>
+        </div>
+    </div>
+
+    <div class="sheet-overlay" id="txDetailOverlay" onclick="closeTxDetail(event)">
+        <div class="bottom-sheet" id="txBottomSheet" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-icon" id="txDetailIcon">🍎</div>
+            <div class="sheet-title" id="txDetailTitle">Apple Store</div>
+            <div class="sheet-amount" id="txDetailAmount">-$99.00</div>
+            
+            <div class="sheet-details">
+                <div class="detail-row">
+                    <span class="detail-label" data-i18n="tx_status">Status</span>
+                    <span class="detail-value" style="color: #4cd964" data-i18n="tx_completed">Completed</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label" data-i18n="tx_date">Date</span>
+                    <span class="detail-value" id="txDetailDate">Today, 10:42 AM</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label" data-i18n="tx_category">Category</span>
+                    <span class="detail-value" id="txDetailCategory">Electronics</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label" data-i18n="tx_card">Card Used</span>
+                    <span class="detail-value">** 4921</span>
+                </div>
+            </div>
+            <button class="btn-glass" onclick="closeTxDetail(null)" data-i18n="tx_close">Close</button>
+        </div>
     </div>
 
     <div class="bottom-nav-container">
         <nav class="bottom-nav glass-panel" id="mainNav">
             <div class="nav-bubble" id="navBubble"></div>
-
-            <div class="nav-item active" onclick="switchTab(this, 'view-balance', 'Balance')">
-                <div class="nav-icon">B</div>
-                <span class="nav-label">Balance</span>
+            <div class="nav-item active" id="tab-balance" onclick="switchTab(this, 'view-balance', 'balance')">
+                <div class="nav-icon">B</div><span class="nav-label" data-i18n="tab_balance">Balance</span>
             </div>
-            <div class="nav-item" onclick="switchTab(this, 'view-cards', 'Cards')">
-                <div class="nav-icon">C</div>
-                <span class="nav-label">Cards</span>
+            <div class="nav-item" id="tab-cards" onclick="switchTab(this, 'view-cards', 'tab_cards')">
+                <div class="nav-icon">C</div><span class="nav-label" data-i18n="tab_cards">Cards</span>
             </div>
-            <div class="nav-item" onclick="switchTab(this, 'view-settings', 'Settings')">
-                <div class="nav-icon">S</div>
-                <span class="nav-label">Settings</span>
+            <div class="nav-item" id="tab-settings" onclick="switchTab(this, 'view-settings', 'tab_settings')">
+                <div class="nav-icon">S</div><span class="nav-label" data-i18n="tab_settings">Settings</span>
             </div>
         </nav>
     </div>
 
     <script>
-        // 1. Скрытие/Отображение баланса
+        const i18n = {
+            en: {
+                balance: "Balance", receive: "Receive", send: "Send", recent_tx: "RECENT TRANSACTIONS", 
+                today_time: "Today, 10:42 AM", yesterday_time: "Yesterday, 08:15 AM",
+                online_card: "Online Card", premium_card: "Premium Card", prepaid_balance: "Prepaid Balance",
+                features: "Features", online_only: "Online Only", activation_fee: "Activation Fee",
+                monthly_maint: "Monthly Maint.", success_tx: "Success Tx Fee", declined_tx: "Declined Tx Fee",
+                tx_fee_up: "Tx Fee (up to $50)", tx_fee_over: "Tx Fee (over $50)", issue_card: "Issue Card",
+                preferences: "PREFERENCES", language: "Language", deposit_method: "Deposit Method", 
+                crypto_deposit: "Crypto Deposit", limits: "Limits: $1 - $100,000", fee: "Fee: 7%", 
+                total_receive: "Total to receive", continue: "Continue", top_up_card: "Top Up Card", 
+                total_balance: "Total Balance", no_cards: "You have no active cards to top up.",
+                create_card: "Create Card", btn_top_up: "Top Up", tab_balance: "Balance", 
+                tab_cards: "Cards", tab_settings: "Settings", placeholder_crypto: "Enter amount (USD)", 
+                placeholder_send: "Amount to send", tx_status: "Status", tx_completed: "Completed", 
+                tx_date: "Date", tx_category: "Category", tx_card: "Card Used", tx_close: "Close"
+            },
+            ru: {
+                balance: "Баланс", receive: "Получить", send: "Отправить", recent_tx: "ПОСЛЕДНИЕ ОПЕРАЦИИ", 
+                today_time: "Сегодня, 10:42", yesterday_time: "Вчера, 08:15",
+                online_card: "Онлайн Карта", premium_card: "Премиум Карта", prepaid_balance: "Предоплата",
+                features: "Функции", online_only: "Только онлайн", activation_fee: "Активация",
+                monthly_maint: "Обслуживание (мес)", success_tx: "Успешная транз.", declined_tx: "Отклоненная транз.",
+                tx_fee_up: "Комиссия (до $50)", tx_fee_over: "Комиссия (свыше $50)", issue_card: "Оформить карту",
+                preferences: "НАСТРОЙКИ", language: "Язык", deposit_method: "Способ пополнения", 
+                crypto_deposit: "Крипто Пополнение", limits: "Лимиты: $1 - $100,000", fee: "Комиссия: 7%", 
+                total_receive: "Итого к получению", continue: "Продолжить", top_up_card: "Пополнить Карту", 
+                total_balance: "Общий баланс", no_cards: "У вас пока нет активных карт для пополнения.",
+                create_card: "Создать карту", btn_top_up: "Пополнить", tab_balance: "Баланс", 
+                tab_cards: "Карты", tab_settings: "Настройки", placeholder_crypto: "Введите сумму (USD)", 
+                placeholder_send: "Сумма перевода", tx_status: "Статус", tx_completed: "Выполнено", 
+                tx_date: "Дата", tx_category: "Категория", tx_card: "Оплачено с", tx_close: "Закрыть"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function changeLanguage() {
+            currentLang = document.getElementById('langSelect').value;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) el.innerText = i18n[currentLang][key];
+            });
+            document.getElementById('cryptoInput').placeholder = i18n[currentLang].placeholder_crypto;
+            document.getElementById('sendInput').placeholder = i18n[currentLang].placeholder_send;
+        }
+
+        // Логика транзакций
+        function openTxDetail(title, icon, amount, dateKey, category) {
+            document.getElementById('txDetailTitle').innerText = title;
+            document.getElementById('txDetailIcon').innerText = icon;
+            document.getElementById('txDetailAmount').innerText = amount;
+            
+            // Берем дату из словаря, чтобы она была на нужном языке
+            document.getElementById('txDetailDate').innerText = i18n[currentLang][dateKey];
+            document.getElementById('txDetailDate').setAttribute('data-i18n', dateKey); // для перевода "на лету"
+            
+            // Категорию для простоты оставляем как есть, но в реальном приложении тоже переводим
+            document.getElementById('txDetailCategory').innerText = category;
+            
+            document.getElementById('txDetailOverlay').classList.add('active');
+        }
+
+        function closeTxDetail(event) {
+            // Если кликнули не на фон (overlay), игнорируем, либо если передали null (кнопка)
+            if (event && event.target !== document.getElementById('txDetailOverlay')) return;
+            document.getElementById('txDetailOverlay').classList.remove('active');
+        }
+
+        // --- Остальной код остается прежним ---
         const balanceToggle = document.getElementById('balanceToggle');
         const balanceAmount = document.getElementById('balanceAmount');
         let isBalanceHidden = false;
-
         balanceToggle.addEventListener('click', () => {
             isBalanceHidden = !isBalanceHidden;
             balanceAmount.style.opacity = '0';
-            setTimeout(() => {
-                if (isBalanceHidden) {
-                    balanceAmount.innerHTML = '****';
-                } else {
-                    balanceAmount.innerHTML = '$1000<span class="cents" id="balanceCents">.00</span>';
-                }
-                balanceAmount.style.opacity = '1';
-            }, 150);
+            setTimeout(() => { balanceAmount.innerHTML = isBalanceHidden ? '****' : '$1000<span class="cents">.00</span>'; balanceAmount.style.opacity = '1'; }, 150);
         });
 
-        // 2. Логика переключения вкладок и "Жидкого пузыря"
+        const navBar = document.getElementById('mainNav');
         const navBubble = document.getElementById('navBubble');
         const headerTitle = document.getElementById('headerTitle');
         const views = document.querySelectorAll('.view-section');
+        const navItems = Array.from(document.querySelectorAll('.nav-item'));
 
-        function switchTab(element, viewId, title) {
-            // Убираем активный класс у всех иконок
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            // Добавляем нажатой
+        function switchTab(element, viewId, titleKey) {
+            navItems.forEach(el => el.classList.remove('active'));
             element.classList.add('active');
-
-            // Анимация "жидкого пузыря". Мы вычисляем позицию нажатого элемента
-            // относительно родительского контейнера (.bottom-nav)
-            const navLeftOffset = document.getElementById('mainNav').getBoundingClientRect().left;
-            const elementLeftOffset = element.getBoundingClientRect().left;
-            const paddingLeft = 24; // отступ внутри nav
+            navBubble.style.transition = 'transform 0.4s cubic-bezier(0.25, 1.2, 0.5, 1)';
+            navBubble.style.transform = `translateX(${element.offsetLeft - 24}px)`;
             
-            // Двигаем пузырь по оси X
-            const moveX = element.offsetLeft; 
-            navBubble.style.transform = `translateX(${moveX - paddingLeft}px)`;
+            headerTitle.innerText = i18n[currentLang][titleKey] || titleKey;
+            headerTitle.setAttribute('data-i18n', titleKey);
 
-            // Меняем заголовок
-            headerTitle.textContent = title;
-
-            // Скрываем все экраны, показываем нужный
-            views.forEach(view => {
-                view.classList.remove('active-view');
-            });
+            views.forEach(view => view.classList.remove('active-view'));
             document.getElementById(viewId).classList.add('active-view');
         }
 
-        // Инициализация стартовой позиции пузыря
-        window.onload = () => {
-            const activeItem = document.querySelector('.nav-item.active');
-            if (activeItem) {
-                const paddingLeft = 24;
-                navBubble.style.transform = `translateX(${activeItem.offsetLeft - paddingLeft}px)`;
-            }
-        };
+        navBar.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            let x = e.touches[0].clientX - navBar.getBoundingClientRect().left;
+            if (x < 64) x = 64; if (x > navBar.offsetWidth - 64) x = navBar.offsetWidth - 64;
+            navBubble.style.transition = 'none';
+            navBubble.style.transform = `translateX(${x - 64}px)`;
+        }, { passive: false });
+
+        navBar.addEventListener('touchend', (e) => {
+            let x = e.changedTouches[0].clientX - navBar.getBoundingClientRect().left;
+            let closestItem = navItems.reduce((prev, curr) => Math.abs(curr.offsetLeft + 40 - x) < Math.abs(prev.offsetLeft + 40 - x) ? curr : prev);
+            closestItem.click();
+        });
+
+        const receiveModal = document.getElementById('receiveModal');
+        const sendModal = document.getElementById('sendModal');
+        const receiveMain = document.getElementById('receiveContentMain');
+        const receiveCrypto = document.getElementById('receiveContentCrypto');
+
+        function openReceiveModal() { receiveMain.style.display = 'flex'; receiveCrypto.style.display = 'none'; receiveModal.classList.add('active'); }
+        function openSendModal() { sendModal.classList.add('active'); }
+        function closeModals() { receiveModal.classList.remove('active'); sendModal.classList.remove('active'); document.getElementById('cryptoInput').value = ''; document.getElementById('cryptoTotal').innerText = '$0.00'; }
+        function showCryptoFlow() { receiveMain.style.display = 'none'; receiveCrypto.style.display = 'flex'; }
+        
+        document.getElementById('cryptoInput').addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value) || 0;
+            document.getElementById('cryptoTotal').innerText = `$${(val * 0.93).toFixed(2)}`;
+        });
+
+        function goToCards() { closeModals(); document.getElementById('tab-cards').click(); }
+
+        changeLanguage();
     </script>
 </body>
 </html>
