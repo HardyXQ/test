@@ -18,21 +18,28 @@
             box-sizing: border-box; margin: 0; padding: 0; 
             font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif; 
             -webkit-tap-highlight-color: transparent; scrollbar-width: none; 
-            /* ГЛОБАЛЬНЫЙ ЗАПРЕТ ВЫДЕЛЕНИЯ ТЕКСТА */
             -webkit-user-select: none;
             user-select: none;
         }
         *::-webkit-scrollbar { display: none; }
 
-        /* Разрешаем выделение только для полей ввода */
         input, textarea, select {
             -webkit-user-select: auto;
             user-select: auto;
         }
 
+        /* Убираем стрелочки у input type="number" */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
         body { background-color: #050508; min-height: 100vh; overflow-x: hidden; position: relative; touch-action: pan-x pan-y; }
 
-        /* Фон */
         .liquid-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); animation: float 15s infinite ease-in-out alternate; opacity: 0.6; }
         .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: linear-gradient(135deg, #cc5500, #ff8c00); top: -10%; left: -10%; }
@@ -43,7 +50,6 @@
 
         .app-container { position: relative; z-index: 10; width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; padding: 40px 24px 140px 24px; min-height: 100vh; }
         
-        /* Заголовок (теперь скроллится со всеми) */
         .header { display: flex; justify-content: center; align-items: center; margin-bottom: 40px; padding-top: 10px; }
         .header h1 { color: var(--text-main); font-size: 16px; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; }
 
@@ -51,7 +57,6 @@
         .view-section.active-view { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Баланс с анимацией скрытия */
         .balance-section { text-align: center; margin-bottom: 30px; cursor: pointer; display: inline-block; align-self: center; }
         .balance-wrapper { position: relative; display: inline-flex; justify-content: center; align-items: center; }
         .balance-real, .balance-hidden { transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
@@ -61,7 +66,6 @@
         .balance-section.is-hidden .balance-real { opacity: 0; transform: scale(1.1); filter: blur(10px); }
         .balance-section.is-hidden .balance-hidden { opacity: 1; transform: scale(1); filter: blur(0); }
 
-        /* Кнопки */
         .actions-group { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 40px; }
         .actions-pill { display: flex; justify-content: center; gap: 50px; border-radius: 100px; padding: 10px 20px; }
         .actions-labels { display: flex; justify-content: center; gap: 50px; padding: 0 20px; }
@@ -72,7 +76,6 @@
         .action-label-wrapper { width: 50px; display: flex; justify-content: center; overflow: visible; }
         .action-label { white-space: nowrap; color: var(--text-main); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
 
-        /* Транзакции */
         .transactions { border-radius: 32px; padding: 24px; flex-grow: 1; margin-bottom: 20px; }
         .transactions-title { color: var(--text-muted); font-size: 13px; font-weight: 600; letter-spacing: 2px; margin-bottom: 20px; }
         .transaction-list { display: flex; flex-direction: column; gap: 12px; }
@@ -85,9 +88,12 @@
         .tx-info p { color: var(--text-muted); font-size: 12px; }
         .tx-amount { font-size: 15px; font-weight: 600; color: var(--text-main); }
 
-        /* CARDS */
-        .cards-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 20px; padding-bottom: 20px; margin: 0 -24px; padding: 0 24px; }
-        .card-slide { scroll-snap-align: center; flex: 0 0 100%; display: flex; flex-direction: column; gap: 24px; }
+        .cards-carousel { 
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 20px; padding-bottom: 20px; margin: 0 -24px; padding: 0 24px; 
+            cursor: grab; /* Курсор для ПК */
+        }
+        .cards-carousel:active { cursor: grabbing; }
+        .card-slide { scroll-snap-align: center; flex: 0 0 100%; display: flex; flex-direction: column; gap: 24px; user-select: none; }
         .credit-card { width: 100%; aspect-ratio: 1.586; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .card-online { background: linear-gradient(135deg, rgba(255,140,0,0.8), rgba(204,85,0,0.8)); backdrop-filter: blur(20px); }
         .card-visa { background: linear-gradient(135deg, rgba(0,180,216,0.8), rgba(0,92,153,0.8)); backdrop-filter: blur(20px); }
@@ -97,7 +103,7 @@
         .card-chip { width: 45px; height: 35px; background: rgba(255,255,255,0.3); border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); }
         .card-balance-lbl { font-size: 12px; opacity: 0.8; margin-top: auto; color: #fff;}
         .card-balance-val { font-size: 28px; font-weight: 700; color: #fff;}
-        .card-details { border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+        .card-details { border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px; pointer-events: none; }
         .detail-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;}
         .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
         .detail-label { color: var(--text-muted); font-size: 14px; }
@@ -106,21 +112,19 @@
         .btn-glass { width: 100%; padding: 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: var(--text-main); font-size: 16px; font-weight: 600; cursor: pointer; backdrop-filter: blur(20px); transition: background 0.3s, transform 0.2s; }
         .btn-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
 
-        /* SETTINGS */
-        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+        .settings-row.clickable:hover { background: rgba(255,255,255,0.08); }
+        .settings-row.clickable:active { transform: scale(0.98); }
         .settings-label { color: var(--text-main); font-size: 16px; font-weight: 500; }
         .select-glass { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 8px 16px; border-radius: 12px; outline: none; font-size: 14px; cursor: pointer; }
         .select-glass option { background: #1a1a1a; color: #fff; }
 
-        /* === ПЛАВНЫЕ МОДАЛКИ (Без display:none) === */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
             z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
-            
-            /* Секрет плавности: управляем видимостью, а не display */
             visibility: hidden; opacity: 0; pointer-events: none; 
-            transition: opacity 0.4s ease, visibility 0.4s ease; 
+            transition: opacity 0.25s ease, visibility 0.25s ease; /* УСКОРЕНО */
         }
         .modal-overlay.active { 
             visibility: visible; opacity: 1; pointer-events: auto; 
@@ -129,7 +133,7 @@
         .modal-content { 
             width: 100%; max-width: 400px; padding: 30px; border-radius: 32px; display: flex; flex-direction: column; gap: 20px; position: relative;
             transform: scale(0.85) translateY(20px); 
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Пружинистое масштабирование */
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); /* УСКОРЕНО */
         }
         .modal-overlay.active .modal-content { 
             transform: scale(1) translateY(0); 
@@ -144,11 +148,10 @@
         .calc-result { text-align: center; color: var(--text-main); font-size: 24px; font-weight: 700; margin: 10px 0; }
         .calc-label { text-align: center; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;}
 
-        /* BOTTOM SHEET */
         .sheet-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); 
-            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; 
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; /* УСКОРЕНО */
         }
         .sheet-overlay.active { opacity: 1; pointer-events: auto; }
         .bottom-sheet { 
@@ -157,7 +160,7 @@
             background: var(--glass-bg); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
             border-top: 1px solid var(--glass-border); border-left: 1px solid var(--glass-border); border-right: 1px solid var(--glass-border);
             border-radius: 32px 32px 0 0; padding: 30px 24px 60px 24px; 
-            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); /* УСКОРЕНО */
             display: flex; flex-direction: column; align-items: center;
         }
         .sheet-overlay.active .bottom-sheet { transform: translateX(-50%) translateY(0); }
@@ -167,7 +170,6 @@
         .sheet-amount { font-size: 32px; font-weight: 700; color: var(--text-main); margin-bottom: 30px; }
         .sheet-details { width: 100%; display: flex; flex-direction: column; gap: 16px; background: rgba(255,255,255,0.02); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px; }
 
-        /* DOCK */
         .bottom-nav-container { position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
         .bottom-nav { pointer-events: auto; border-radius: 40px; padding: 12px 24px; display: flex; gap: 10px; position: relative; }
         .nav-bubble { 
@@ -231,7 +233,7 @@
         </div>
 
         <div id="view-cards" class="view-section">
-            <div class="cards-carousel">
+            <div class="cards-carousel" id="cardsCarousel">
                 <div class="card-slide">
                     <div class="credit-card card-online"><div class="card-header"><span class="card-title" data-i18n="online_card">Online Card</span><span class="card-logo">Mastercard</span></div><div class="card-chip"></div><div><div class="card-balance-lbl" data-i18n="prepaid_balance">Prepaid Balance</div><div class="card-balance-val">$15.00</div></div></div>
                     <div class="card-details glass-panel">
@@ -267,6 +269,18 @@
                     </select>
                 </div>
             </div>
+
+            <div class="transactions glass-panel" style="margin-top: 20px;">
+                <h2 class="transactions-title" data-i18n="help_center">HELP CENTER</h2>
+                <div class="settings-row clickable" style="margin-bottom: 12px; cursor: pointer;" onclick="alert('FAQ opened')">
+                    <span class="settings-label" data-i18n="faq">FAQ</span>
+                    <span style="color: var(--text-muted); font-size: 20px;">›</span>
+                </div>
+                <div class="settings-row clickable" style="cursor: pointer;" onclick="alert('Support opened')">
+                    <span class="settings-label" data-i18n="support">Support</span>
+                    <span style="color: var(--text-muted); font-size: 20px;">›</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -280,7 +294,7 @@
         <div class="modal-content glass-panel" id="receiveContentCrypto" style="display: none;" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="forceCloseModals()">×</button>
             <h3 class="modal-title" data-i18n="crypto_deposit">Crypto Deposit</h3>
-            <input type="number" id="cryptoInput" class="input-glass" placeholder="Enter amount (USD)" />
+            <input type="text" inputmode="decimal" id="cryptoInput" class="input-glass" placeholder="Enter amount (USD)" />
             <div class="input-info"><span data-i18n="limits">Limits: $1 - $100,000</span><span data-i18n="fee">Fee: 7%</span></div>
             <div style="margin-top: 10px;"><div class="calc-label" data-i18n="total_receive">Total to receive</div><div class="calc-result" id="cryptoTotal">$0.00</div></div>
             <button class="btn-glass" data-i18n="continue">Continue</button>
@@ -293,7 +307,7 @@
             <h3 class="modal-title" data-i18n="top_up_card">Top Up Card</h3>
             <div class="calc-label" data-i18n="total_balance">Total Balance</div>
             <div class="calc-result" style="margin-top:0;">$1000.00</div>
-            <input type="number" class="input-glass" id="sendInput" placeholder="Amount to send" />
+            <input type="text" inputmode="decimal" class="input-glass" id="sendInput" placeholder="Amount to send" />
             <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; margin: 10px 0;">
                 <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;" data-i18n="no_cards">You have no active cards to top up.</p>
                 <button class="btn-glass" style="padding: 10px; font-size: 14px;" onclick="goToCards()" data-i18n="create_card">Create Card</button>
@@ -329,9 +343,10 @@
     </div>
 
     <script>
+        // Обновленный словарь
         const i18n = {
-            en: { balance: "Balance", receive: "Receive", send: "Send", recent_tx: "RECENT TRANSACTIONS", today_time: "Today, 10:42 AM", yesterday_time: "Yesterday, 08:15 AM", online_card: "Online Card", premium_card: "Premium Card", prepaid_balance: "Prepaid Balance", features: "Features", online_only: "Online Only", activation_fee: "Activation Fee", monthly_maint: "Monthly Maint.", success_tx: "Success Tx Fee", declined_tx: "Declined Tx Fee", tx_fee_up: "Tx Fee (up to $50)", tx_fee_over: "Tx Fee (over $50)", issue_card: "Issue Card", preferences: "PREFERENCES", language: "Language", deposit_method: "Deposit Method", crypto_deposit: "Crypto Deposit", limits: "Limits: $1 - $100,000", fee: "Fee: 7%", total_receive: "Total to receive", continue: "Continue", top_up_card: "Top Up Card", total_balance: "Total Balance", no_cards: "You have no active cards to top up.", create_card: "Create Card", btn_top_up: "Top Up", tab_balance: "Balance", tab_cards: "Cards", tab_settings: "Settings", placeholder_crypto: "Enter amount (USD)", placeholder_send: "Amount to send", tx_status: "Status", tx_completed: "Completed", tx_date: "Date", tx_category: "Category", tx_card: "Card Used", tx_close: "Close" },
-            ru: { balance: "Баланс", receive: "Получить", send: "Отправить", recent_tx: "ПОСЛЕДНИЕ ОПЕРАЦИИ", today_time: "Сегодня, 10:42", yesterday_time: "Вчера, 08:15", online_card: "Онлайн Карта", premium_card: "Премиум Карта", prepaid_balance: "Предоплата", features: "Функции", online_only: "Только онлайн", activation_fee: "Активация", monthly_maint: "Обслуживание (мес)", success_tx: "Успешная транз.", declined_tx: "Отклоненная транз.", tx_fee_up: "Комиссия (до $50)", tx_fee_over: "Комиссия (свыше $50)", issue_card: "Оформить карту", preferences: "НАСТРОЙКИ", language: "Язык", deposit_method: "Способ пополнения", crypto_deposit: "Крипто Пополнение", limits: "Лимиты: $1 - $100,000", fee: "Комиссия: 7%", total_receive: "Итого к получению", continue: "Продолжить", top_up_card: "Пополнить Карту", total_balance: "Общий баланс", no_cards: "У вас пока нет активных карт для пополнения.", create_card: "Создать карту", btn_top_up: "Пополнить", tab_balance: "Баланс", tab_cards: "Карты", tab_settings: "Настройки", placeholder_crypto: "Введите сумму (USD)", placeholder_send: "Сумма перевода", tx_status: "Статус", tx_completed: "Выполнено", tx_date: "Дата", tx_category: "Категория", tx_card: "Оплачено с", tx_close: "Закрыть" }
+            en: { balance: "Balance", receive: "Receive", send: "Send", recent_tx: "RECENT TRANSACTIONS", today_time: "Today, 10:42 AM", yesterday_time: "Yesterday, 08:15 AM", online_card: "Online Card", premium_card: "Premium Card", prepaid_balance: "Prepaid Balance", features: "Features", online_only: "Online Only", activation_fee: "Activation Fee", monthly_maint: "Monthly Maint.", success_tx: "Success Tx Fee", declined_tx: "Declined Tx Fee", tx_fee_up: "Tx Fee (up to $50)", tx_fee_over: "Tx Fee (over $50)", issue_card: "Issue Card", preferences: "PREFERENCES", language: "Language", help_center: "HELP CENTER", faq: "FAQ", support: "Support", deposit_method: "Deposit Method", crypto_deposit: "Crypto Deposit", limits: "Limits: $1 - $100,000", fee: "Fee: 7%", total_receive: "Total to receive", continue: "Continue", top_up_card: "Top Up Card", total_balance: "Total Balance", no_cards: "You have no active cards to top up.", create_card: "Create Card", btn_top_up: "Top Up", tab_balance: "Balance", tab_cards: "Cards", tab_settings: "Settings", placeholder_crypto: "Enter amount (USD)", placeholder_send: "Amount to send", tx_status: "Status", tx_completed: "Completed", tx_date: "Date", tx_category: "Category", tx_card: "Card Used", tx_close: "Close" },
+            ru: { balance: "Баланс", receive: "Получить", send: "Отправить", recent_tx: "ПОСЛЕДНИЕ ОПЕРАЦИИ", today_time: "Сегодня, 10:42", yesterday_time: "Вчера, 08:15", online_card: "Онлайн Карта", premium_card: "Премиум Карта", prepaid_balance: "Предоплата", features: "Функции", online_only: "Только онлайн", activation_fee: "Активация", monthly_maint: "Обслуживание (мес)", success_tx: "Успешная транз.", declined_tx: "Отклоненная транз.", tx_fee_up: "Комиссия (до $50)", tx_fee_over: "Комиссия (свыше $50)", issue_card: "Оформить карту", preferences: "НАСТРОЙКИ", language: "Язык", help_center: "ПОМОЩЬ", faq: "Частые вопросы", support: "Служба поддержки", deposit_method: "Способ пополнения", crypto_deposit: "Крипто Пополнение", limits: "Лимиты: $1 - $100,000", fee: "Комиссия: 7%", total_receive: "Итого к получению", continue: "Продолжить", top_up_card: "Пополнить Карту", total_balance: "Общий баланс", no_cards: "У вас пока нет активных карт для пополнения.", create_card: "Создать карту", btn_top_up: "Пополнить", tab_balance: "Баланс", tab_cards: "Карты", tab_settings: "Настройки", placeholder_crypto: "Введите сумму (USD)", placeholder_send: "Сумма перевода", tx_status: "Статус", tx_completed: "Выполнено", tx_date: "Дата", tx_category: "Категория", tx_card: "Оплачено с", tx_close: "Закрыть" }
         };
 
         let currentLang = 'en';
@@ -342,12 +357,10 @@
             document.getElementById('sendInput').placeholder = i18n[currentLang].placeholder_send;
         }
 
-        // Анимация скрытия баланса
         document.getElementById('balanceToggle').addEventListener('click', function() {
             this.classList.toggle('is-hidden');
         });
 
-        // Навигация
         const navBar = document.getElementById('mainNav');
         const navBubble = document.getElementById('navBubble');
         const headerTitle = document.getElementById('headerTitle');
@@ -366,7 +379,6 @@
             document.getElementById(viewId).classList.add('active-view');
         }
 
-        // Эффект Лупы
         navBar.addEventListener('touchstart', () => {
             navBubble.style.setProperty('--loupe-scale', '1.15');
             navItems.find(el => el.classList.contains('active')).classList.add('loupe-active');
@@ -390,7 +402,45 @@
             closestItem.click();
         });
 
-        // Модалки
+        // Драг карусели для десктопа
+        const carousel = document.getElementById('cardsCarousel');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        carousel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            carousel.style.scrollSnapType = 'none';
+            startX = e.pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+        });
+        carousel.addEventListener('mouseleave', () => {
+            isDown = false;
+            carousel.style.scrollSnapType = 'x mandatory';
+        });
+        carousel.addEventListener('mouseup', () => {
+            isDown = false;
+            carousel.style.scrollSnapType = 'x mandatory';
+        });
+        carousel.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 1.5; // Скорость прокрутки
+            carousel.scrollLeft = scrollLeft - walk;
+        });
+
+        // Строгая фильтрация инпутов (только положительные числа и 1 точка)
+        function sanitizeNumberInput(e) {
+            let val = e.target.value;
+            val = val.replace(/[^0-9.]/g, ''); // Удаляем всё кроме цифр и точек
+            const parts = val.split('.');
+            if (parts.length > 2) {
+                val = parts[0] + '.' + parts.slice(1).join(''); // Запрет второй точки
+            }
+            e.target.value = val;
+        }
+
         const receiveModal = document.getElementById('receiveModal');
         const sendModal = document.getElementById('sendModal');
         
@@ -398,7 +448,7 @@
             document.getElementById('receiveContentMain').style.display = 'flex'; 
             document.getElementById('receiveContentCrypto').style.display = 'none'; 
             receiveModal.classList.add('active'); 
-            document.body.style.overflow = 'hidden'; // Защита от скролла фона
+            document.body.style.overflow = 'hidden';
         }
         function openSendModal() { 
             sendModal.classList.add('active'); 
@@ -412,18 +462,22 @@
         function forceCloseModals() { 
             receiveModal.classList.remove('active'); 
             sendModal.classList.remove('active'); 
-            document.body.style.overflow = ''; // Возвращаем скролл
+            document.body.style.overflow = '';
         }
         function showCryptoFlow() { 
             document.getElementById('receiveContentMain').style.display = 'none'; 
             document.getElementById('receiveContentCrypto').style.display = 'flex'; 
         }
+
         document.getElementById('cryptoInput').addEventListener('input', (e) => {
-            document.getElementById('cryptoTotal').innerText = `$${((parseFloat(e.target.value) || 0) * 0.93).toFixed(2)}`;
+            sanitizeNumberInput(e);
+            let num = parseFloat(e.target.value) || 0;
+            document.getElementById('cryptoTotal').innerText = `$${(num * 0.93).toFixed(2)}`;
         });
+        document.getElementById('sendInput').addEventListener('input', sanitizeNumberInput);
+
         function goToCards() { forceCloseModals(); document.getElementById('tab-cards').click(); }
 
-        // Транзакции (Bottom Sheet Drag to Close + фикс скролла)
         const txOverlay = document.getElementById('txDetailOverlay');
         const txSheet = document.getElementById('txBottomSheet');
         let sheetStartY = 0; let sheetCurrentY = 0;
@@ -436,9 +490,9 @@
             document.getElementById('txDetailDate').setAttribute('data-i18n', dateKey);
             document.getElementById('txDetailCategory').innerText = category;
             
-            document.body.style.overflow = 'hidden'; // Блокируем скролл фона
+            document.body.style.overflow = 'hidden'; 
             
-            txSheet.style.transition = 'transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)';
+            txSheet.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
             txSheet.style.transform = `translateX(-50%) translateY(0)`;
             txOverlay.classList.add('active');
         }
@@ -448,10 +502,9 @@
             txSheet.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
             txSheet.style.transform = `translateX(-50%) translateY(100%)`;
             txOverlay.classList.remove('active'); 
-            document.body.style.overflow = ''; // Возвращаем скролл фона
+            document.body.style.overflow = ''; 
         }
 
-        // Физика свайпа для карточки транзакции
         txSheet.addEventListener('touchstart', (e) => {
             sheetStartY = e.touches[0].clientY;
             sheetCurrentY = sheetStartY;
@@ -461,11 +514,11 @@
         txSheet.addEventListener('touchmove', (e) => {
             let diff = e.touches[0].clientY - sheetStartY;
             if (diff > 0) { 
-                e.preventDefault(); // Останавливает любое дергание браузера
+                e.preventDefault(); 
                 sheetCurrentY = e.touches[0].clientY;
                 txSheet.style.transform = `translateX(-50%) translateY(${diff}px)`;
             }
-        }, { passive: false }); // Важно! passive: false позволяет использовать preventDefault()
+        }, { passive: false }); 
 
         txSheet.addEventListener('touchend', () => {
             let diff = sheetCurrentY - sheetStartY;
